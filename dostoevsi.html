@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ф.М. Достоевский | Жизнь и Творчество</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #1a1a1a;
+            --paper-tint: #f4e4bc;
+            --gold: #c5a059;
+            --gold-dim: #8e7341;
+            --text-light: #e0d8c0;
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'EB+Garamond', serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%),
+                url('https://www.transparenttextures.com/patterns/dark-matter.png');
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- Эффект старой бумаги/газеты --- */
+        .paper-texture {
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--gold-dim);
+            padding: 2rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .paper-texture:hover {
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 20px rgba(197, 160, 89, 0.2);
+        }
+
+        /* --- Header --- */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(26,26,26,0.5), var(--bg-dark)),
+                        url('https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&q=80&w=2000');
+            background-size: cover;
+            background-position: center;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1.5s ease-out;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-style: italic;
+            opacity: 0.8;
+            animation: fadeInUp 2s ease-out;
+        }
+
+        /* --- Биография --- */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .bio-toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            margin: 0 5px;
+        }
+
+        .toggle-btn.active {
+            background: var(--gold);
+            color: var(--bg-dark);
+        }
+
+        .bio-content {
+            min-height: 300px;
+            position: relative;
+        }
+
+        .bio-version {
+            display: none;
+            animation: fadeIn 0.8s forwards;
+        }
+
+        .bio-version.active {
+            display: block;
+        }
+
+        /* --- Лента времени (Главный элемент) --- */
+        .timeline-wrapper {
+            width: 100vw;
+            padding: 8rem 0;
+            overflow-x: auto;
+            background: rgba(0,0,0,0.3);
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+
+        .timeline-container {
+            width: 2000px; /* Фиксированная ширина для горизонтального скролла */
+            height: 500px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        /* Горизонтальная стрелка */
+        .timeline-arrow {
+            position: absolute;
+            top: 50%;
+            left: 50px;
+            right: 50px;
+            height: 6px;
+            background: var(--gold);
+            transform: translateY(-50%);
+        }
+
+        .timeline-arrow::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: -12px;
+            border-left: 20px solid var(--gold);
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+        }
+
+        .timeline-item {
+            position: absolute;
+            width: 220px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        /* Шахматный порядок */
+        .timeline-item.up {
+            bottom: 55%;
+        }
+
+        .timeline-item.down {
+            top: 55%;
+        }
+
+        .dot {
+            width: 20px;
+            height: 20px;
+            background: var(--bg-dark);
+            border: 3px solid var(--gold);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .up .dot { bottom: -33px; }
+        .down .dot { top: -33px; }
+
+        .timeline-item:hover .dot {
+            background: var(--gold);
+            box-shadow: 0 0 15px var(--gold);
+        }
+
+        .date-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-short {
+            font-size: 0.95rem;
+            opacity: 0.7;
+        }
+
+        /* Модальное окно/блок информации о событии */
+        #event-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background: #2a2a2a;
+            border: 2px solid var(--gold);
+            padding: 2.5rem;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+            text-align: center;
+            animation: inkSpread 0.6s ease-out;
+        }
+
+        #event-display h3 { margin-bottom: 1rem; }
+        #event-display p { font-size: 1.2rem; margin-bottom: 1.5rem; }
+        
+        .close-btn {
+            color: var(--gold);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .overlay {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            z-index: 90;
+        }
+
+        /* --- Произведения --- */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .book-card {
+            border: 1px solid var(--gold-dim);
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.02);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(197, 160, 89, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* --- Анимации --- */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes inkSpread {
+            from { clip-path: circle(0% at 50% 50%); opacity: 0; }
+            to { clip-path: circle(100% at 50% 50%); opacity: 1; }
+        }
+
+        /* --- Адаптивность --- */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .timeline-container { height: 400px; }
+            .timeline-item { width: 160px; }
+            .date-label { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="hero-title">Фёдор Михайлович Достоевский</h1>
+        <p class="hero-subtitle">«Красота спасёт мир»</p>
+    </header>
+
+    <!-- Секция Биографии -->
+    <section class="section">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Очерк Жизни</h2>
+        <div class="bio-toggle-container">
+            <button class="toggle-btn active" onclick="showBio('short', this)">Краткая версия</button>
+            <button class="toggle-btn" onclick="showBio('long', this)">Подробная версия</button>
+        </div>
+
+        <div class="bio-content paper-texture">
+            <div id="bio-short" class="bio-version active">
+                <p>Фёдор Достоевский — один из самых значимых писателей-мыслителей в мировой литературе. Его жизнь была полна драматических поворотов: от раннего литературного триумфа до приговора к смерти и каторги, ставшей переломным моментом в его мировоззрении. Он сумел заглянуть в самые потаённые глубины человеческой души, исследуя темы веры, свободы и нравственного выбора.</p>
+            </div>
+            <div id="bio-long" class="bio-version">
+                <p>Родившись в семье военного медика в 1821 году, Фёдор Михайлович рано познал тяготы и радости жизни в Москве. Его литературный дебют с романом «Бедные люди» вызвал восторг у Белинского и Некрасова. Однако увлечение социалистическими идеями привело к аресту в 1849 году. Ожидание расстрела на Семёновском плацу, заменённое в последний момент каторгой, навсегда изменило его. </p>
+                <br>
+                <p>Вернувшись из Сибири, он создал свои величайшие шедевры — «Великое Пятикнижие». Несмотря на финансовые трудности и личные потери, он продолжал творить, находя поддержку в своей супруге Анне Григорьевне Сниткиной. Его творчество стало фундаментом для экзистенциализма и психоанализа XX века.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Лента времени -->
+    <h2 style="text-align: center; margin-top: 4rem;">Хронология судьбы</h2>
+    <div class="timeline-wrapper">
+        <div class="timeline-container">
+            <div class="timeline-arrow"></div>
+
+            <!-- Событие 1: Рождение -->
+            <div class="timeline-item up" style="left: 100px;" onclick="showEvent(0)">
+                <span class="date-label">1821</span>
+                <span class="event-short">Рождение классика</span>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Событие 2: Бедные люди -->
+            <div class="timeline-item down" style="left: 400px;" onclick="showEvent(1)">
+                <span class="date-label">1846</span>
+                <span class="event-short">Литературный триумф</span>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Событие 3: Арест -->
+            <div class="timeline-item up" style="left: 700px;" onclick="showEvent(2)">
+                <span class="date-label">1849</span>
+                <span class="event-short">Испытание на плацу</span>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Событие 4: Преступление и наказание -->
+            <div class="timeline-item down" style="left: 1000px;" onclick="showEvent(3)">
+                <span class="date-label">1866</span>
+                <span class="event-short">Шедевр психологии</span>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Событие 5: Женитьба -->
+            <div class="timeline-item up" style="left: 1300px;" onclick="showEvent(4)">
+                <span class="date-label">1867</span>
+                <span class="event-short">Анна Сниткина</span>
+                <div class="dot"></div>
+            </div>
+
+            <!-- Событие 6: Смерть -->
+            <div class="timeline-item down" style="left: 1600px;" onclick="showEvent(5)">
+                <span class="date-label">1881</span>
+                <span class="event-short">Вечный покой</span>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно событий -->
+    <div class="overlay" id="overlay" onclick="closeEvent()"></div>
+    <div id="event-display">
+        <h3 id="event-title">Заголовок</h3>
+        <p id="event-desc">Описание события</p>
+        <span class="close-btn" onclick="closeEvent()">Вернуться к чтению</span>
+    </div>
+
+    <!-- Главные произведения -->
+    <section class="section">
+        <h2 style="text-align: center;">Бессмертные Творения</h2>
+        <div class="books-grid">
+            <div class="book-card">
+                <h3>Бедные люди</h3>
+                <p>Первый роман, открывший миру «маленького человека» и принёсший автору мгновенную славу.</p>
+            </div>
+            <div class="book-card">
+                <h3>Преступление и наказание</h3>
+                <p>Философское исследование границ свободы и цены человеческой жизни.</p>
+            </div>
+            <div class="book-card">
+                <h3>Идиот</h3>
+                <p>Попытка изобразить «положительно прекрасного человека» в несовершенном мире.</p>
+            </div>
+            <div class="book-card">
+                <h3>Братья Карамазовы</h3>
+                <p>Итоговое произведение, ставящее вопросы о Боге, бессмертии и семейных узах.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 4rem; opacity: 0.6; border-top: 1px solid var(--gold-dim);">
+        <p>&copy; 2024 Школьный проект по литературе</p>
+    </footer>
+
+    <script>
+        // Данные для ленты времени
+        const timelineEvents = [
+            {
+                title: "1821: Рождение",
+                desc: "Фёдор Михайлович родился 11 ноября в Москве, в семье штаб-лекаря Мариинской больницы для бедных."
+            },
+            {
+                title: "1846: Первый успех",
+                desc: "Публикация романа «Бедные люди». Некрасов и Белинский провозглашают появление «нового Гоголя»."
+            },
+            {
+                title: "1849: Переломный год",
+                desc: "Арест по делу петрашевцев. Казнь была отменена в самый последний момент, когда солдаты уже подняли ружья. Далее — 4 года каторги."
+            },
+            {
+                title: "1866: Великий роман",
+                desc: "Выходит «Преступление и наказание». Роман производит эффект разорвавшейся бомбы в литературном мире."
+            },
+            {
+                title: "1867: Счастье и опора",
+                desc: "Женитьба на Анне Сниткиной, которая стала не только женой, но и преданным помощником и издателем писателя."
+            },
+            {
+                title: "1881: Уход",
+                desc: "Достоевский скончался в Санкт-Петербурге. Десятки тысяч людей пришли проводить писателя в последний путь."
+            }
+        ];
+
+        // Функция переключения биографии
+        function showBio(type, btn) {
+            document.querySelectorAll('.bio-version').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('bio-' + type).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // Функции модального окна (Лента времени)
+        function showEvent(index) {
+            const display = document.getElementById('event-display');
+            const overlay = document.getElementById('overlay');
+            const event = timelineEvents[index];
+
+            document.getElementById('event-title').innerText = event.title;
+            document.getElementById('event-desc').innerText = event.desc;
+
+            overlay.style.display = 'block';
+            display.style.display = 'block';
+        }
+
+        function closeEvent() {
+            document.getElementById('event-display').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // Плавная прокрутка для ленты времени мышкой (drag scroll)
+        const slider = document.querySelector('.timeline-wrapper');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+        slider.addEventListener('mouseleave', () => { isDown = false; });
+        slider.addEventListener('mouseup', () => { isDown = false; });
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        });
+    </script>
+</body>
+</html>
